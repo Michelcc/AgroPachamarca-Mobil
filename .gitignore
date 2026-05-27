@@ -1,0 +1,42 @@
+# Expo / herramientas previas (Android/iOS generados con prebuild)
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Android
+**/android/**/local.properties
+**/android/**/.gradle/
+**/android/**/captures/
+
+# iOS
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+
+# React Native / Expo
+node_modules/
+.expo/
+.expo-shared/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Panel web (repo separado: AgroPachamarca-Web)
+web-admin/
+
+# Secretos y artefactos locales
+**/.env
+!**/.env.example
+*.apk
+.expo-export-test/
+agent-tools/
+android/.kotlin/
+**/android/**/build/
