@@ -1,15 +1,60 @@
 # Agro — Android
 
+App móvil **Agro Pachamarca** para productores de campo. Parte del monorepo en la raíz (`../src/`). Arquitectura **BaaS**: la app habla directo con Supabase (Auth + PostgreSQL + RLS), sin servidor intermedio.
+
 Abre **`C:\m\android`** en Android Studio (ruta corta). No uses `subst P:`: rompe Gradle/Expo en Windows.
+
+---
+
+## Arquitectura de la app
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    APP MÓVIL (Expo)                      │
+├─────────────────────────────────────────────────────────┤
+│  MainTabs (bottom bar)                                   │
+│    Inicio │ Datos │ Dimensiones │ Perfil                │
+├─────────────────────────────────────────────────────────┤
+│  Root Stack (pantallas modales / detalle)                │
+│    DimensionDetail · Productos · Sensores · Clima      │
+│    Cultivo · Planta IA · RegistroTabla                   │
+├─────────────────────────────────────────────────────────┤
+│  Capa de datos (src/features/)                           │
+│    campo · sensores · operacionalizacion · perfil        │
+├─────────────────────────────────────────────────────────┤
+│  Supabase JS Client (anon key + JWT del usuario)         │
+└──────────────────────────┬──────────────────────────────┘
+                           ▼
+                  Supabase PostgreSQL + RLS
+```
+
+### Navegación por dimensiones
+
+La pestaña **Dimensiones** muestra las 4 dimensiones de la tesis (*Cultivos agrícolas*):
+
+| Dimensión | Módulos accesibles desde la app |
+|-----------|--------------------------------|
+| Productividad | Productos |
+| Gestión de recursos | Productos, Sensores de suelo |
+| Predicción agrícola | Cultivo (ML), Clima (alertas), Diagnósticos IA |
+| Toma de decisiones | Solo indicadores (encuesta 1–5) |
+
+Cada dimensión permite **registrar indicadores** en `indicadores_operacionalizacion` con GPS automático.
+
+Definición en código: `../src/schema/operacionalizacion.ts` y `../src/schema/dimensionModulos.ts`.
+
+---
 
 ## Qué hay en cada sitio
 
 | Ubicación | Qué es |
 |-----------|--------|
-| `android/.env` | Claves Supabase |
-| `android/supabase/schema.sql` | SQL para la base de datos |
-| `android/app/` | Código nativo (Kotlin) |
-| `../src/` | Pantallas Expo |
+| `android/.env` | `EXPO_PUBLIC_SUPABASE_URL` + `EXPO_PUBLIC_SUPABASE_ANON_KEY` (clave `eyJ…`) |
+| `android/supabase/*.sql` | Scripts SQL — ejecutar en Supabase en orden |
+| `android/app/` | Proyecto nativo Gradle/Kotlin |
+| `../src/` | Pantallas, navegación, features Expo (JS/TS) |
+
+---
 
 ## 1. Supabase (una vez)
 
@@ -17,8 +62,13 @@ Abre **`C:\m\android`** en Android Studio (ruta corta). No uses `subst P:`: romp
 2. **Authentication** → Email activado.
 3. **SQL Editor** → ejecutar en orden:
    - `supabase/schema.sql`
-   - `supabase/schema-tablas-campo.sql` (crea las **109 tablas** visibles en Table Editor)
-4. `copy .env.example .env` y pegar URL + anon key.
+   - `supabase/schema-tablas-campo.sql` (109 tablas de campo)
+   - `supabase/schema-sensores-suelo.sql` (humedad, pH, temperatura IoT)
+   - `supabase/schema-operacionalizacion.sql` (12 indicadores — variable *Cultivos agrícolas*)
+   - `supabase/patch-productos-catalog-rls.sql` (catálogo productos visible en app + panel)
+4. `copy .env.example .env` y pegar URL + **anon key** (`eyJ…`, no `sb_publishable_…`).
+
+---
 
 ## 2. Android Studio (recomendado)
 
@@ -41,6 +91,8 @@ Luego **File → Open** → `C:\m\android`.
 
 Si falta el SDK, copia `local.properties.example` a `local.properties` y ajusta `sdk.dir`.
 
+---
+
 ## 3. Compilar por terminal
 
 ```powershell
@@ -51,21 +103,33 @@ cd android
 
 `iniciar.ps1` crea `C:\m`, limpia cachés `.cxx`/`build` y ejecuta `npx expo run:android`.
 
-**Paquete Android:** `com.agro` (nombre corto para rutas de compilación).
+**Paquete Android:** `com.agro`
 
-## 4. Instalar app (sin Metro — obligatorio para evitar pantalla roja)
+---
 
-**No uses Run en Android Studio** para probar la app. Esa version pide Metro.
+## 4. Instalar app (sin Metro — recomendado)
 
-Telefono por USB con depuracion activada:
+**No uses Run en Android Studio** para probar. Esa versión pide Metro en localhost.
+
+Teléfono por USB con depuración activada:
 
 ```powershell
 cd android
 .\instalar-app.ps1
 ```
 
-Hace todo: compila APK con JS + Supabase dentro, desinstala la app vieja e instala **Agro**.
+Compila APK con JS embebido + Supabase, desinstala la app vieja e instala **Agro**.
 
 Archivo generado: `agro-release.apk` en la carpeta `mobile\`.
 
-> Si ves "Unable to load script", desinstala Agro del telefono y vuelve a ejecutar `.\instalar-app.ps1`.
+> Si ves "Unable to load script", desinstala Agro del teléfono y vuelve a ejecutar `.\instalar-app.ps1`.
+
+---
+
+## Verificación
+
+Desde la raíz del monorepo:
+
+```powershell
+npm run typecheck
+```
