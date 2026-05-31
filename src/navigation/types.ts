@@ -7,14 +7,17 @@ export type RootStackParamList = {
   Auth: undefined;
   Main: undefined;
   RegistroTabla: { tabla: string };
+  DimensionDetail: { dimensionId: string };
+  ModuloProductos: undefined;
+  ModuloSensores: undefined;
+  ModuloClima: undefined;
+  ModuloCultivo: undefined;
+  ModuloPlanta: undefined;
 };
 
 export type MainTabParamList = {
   Inicio: undefined;
   Datos: undefined;
-  Clima: undefined;
-  Cultivo: undefined;
-  Planta: undefined;
-  Productos: undefined;
+  Dimensiones: undefined;
   Perfil: undefined;
 };

@@ -10,13 +10,20 @@ import {
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { CompositeNavigationProp } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../auth/AuthContext";
 import { SectionCard } from "../components/SectionCard";
 import { StatGrid } from "../components/StatGrid";
 import { loadUserProfile, type UserProfile } from "../features/perfil/profileRepository";
-import type { MainTabParamList } from "../navigation/types";
+import type { MainTabParamList, RootStackParamList } from "../navigation/types";
 import { agro, APP_BRAND, APP_VERSION } from "../theme/agroTheme";
+
+type PerfilNav = CompositeNavigationProp<
+  BottomTabNavigationProp<MainTabParamList>,
+  NativeStackNavigationProp<RootStackParamList>
+>;
 
 function formatFecha(iso: string | null): string {
   if (!iso) return "—";
@@ -42,7 +49,7 @@ function Fila({ label, value }: { label: string; value: string }) {
 
 export function PerfilScreen() {
   const { signOut } = useAuth();
-  const navigation = useNavigation<BottomTabNavigationProp<MainTabParamList>>();
+  const navigation = useNavigation<PerfilNav>();
   const insets = useSafeAreaInsets();
   const [perfil, setPerfil] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -155,7 +162,7 @@ export function PerfilScreen() {
             <Text style={styles.iaLabel}>diagnósticos guardados en tu cuenta</Text>
             <Pressable
               style={styles.iaBtn}
-              onPress={() => navigation.navigate("Planta")}
+              onPress={() => navigation.navigate("ModuloPlanta")}
             >
               <Text style={styles.iaBtnText}>Ir a Mi planta — IA</Text>
             </Pressable>

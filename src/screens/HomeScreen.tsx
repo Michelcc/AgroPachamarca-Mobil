@@ -2,29 +2,38 @@ import { useCallback, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { CompositeNavigationProp } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ProgressBar } from "../components/ProgressBar";
 import { SectionCard } from "../components/SectionCard";
 import { calcularProgreso } from "../features/campo/campoRepository";
 import type { ProgresoCampo } from "../features/campo/campoRepository";
-import type { MainTabParamList } from "../navigation/types";
+import type { MainTabParamList, RootStackParamList } from "../navigation/types";
+import { DIMENSIONES_OPERACIONALIZACION } from "../schema/operacionalizacion";
 import { useAuth } from "../auth/AuthContext";
 import { captureGpsSnapshot } from "../utils/gpsService";
 import { agro } from "../theme/agroTheme";
 
-type AccesoRapido = {
-  tab: keyof MainTabParamList;
-  emoji: string;
-  titulo: string;
-  color: string;
-};
+type HomeNav = CompositeNavigationProp<
+  BottomTabNavigationProp<MainTabParamList>,
+  NativeStackNavigationProp<RootStackParamList>
+>;
+
+type AccesoRapido =
+  | { kind: "tab"; tab: keyof MainTabParamList; emoji: string; titulo: string; color: string }
+  | { kind: "dimension"; dimensionId: string; emoji: string; titulo: string; color: string };
 
 const ACCESOS: AccesoRapido[] = [
-  { tab: "Datos", emoji: "📋", titulo: "Datos", color: agro.purple600 },
-  { tab: "Clima", emoji: "☁️", titulo: "Clima", color: agro.sky600 },
-  { tab: "Cultivo", emoji: "🌾", titulo: "Cultivo", color: agro.green600 },
-  { tab: "Planta", emoji: "🔬", titulo: "Mi planta", color: agro.amber600 },
-  { tab: "Productos", emoji: "📦", titulo: "Productos", color: agro.red600 }
+  { kind: "tab", tab: "Datos", emoji: "📋", titulo: "Datos", color: agro.purple600 },
+  { kind: "tab", tab: "Dimensiones", emoji: "📊", titulo: "Dimensiones", color: agro.green700 },
+  ...DIMENSIONES_OPERACIONALIZACION.map((d, i) => ({
+    kind: "dimension" as const,
+    dimensionId: d.id,
+    emoji: ["📈", "💧", "🌤️", "✅"][i] ?? "📊",
+    titulo: d.nombre,
+    color: [agro.green600, "#7c3aed", agro.sky600, agro.amber600][i] ?? agro.green600
+  }))
 ];
 
 const CATEGORIA_COLORS: Record<string, string> = {
@@ -38,7 +47,7 @@ const CATEGORIA_COLORS: Record<string, string> = {
 
 export function HomeScreen() {
   const { currentUser } = useAuth();
-  const navigation = useNavigation<BottomTabNavigationProp<MainTabParamList>>();
+  const navigation = useNavigation<HomeNav>();
   const insets = useSafeAreaInsets();
   const [progreso, setProgreso] = useState<ProgresoCampo | null>(null);
   const [gpsLine, setGpsLine] = useState("Obteniendo GPS…");
@@ -96,9 +105,15 @@ export function HomeScreen() {
       <View style={styles.grid}>
         {ACCESOS.map((item) => (
           <Pressable
-            key={item.tab}
+            key={item.kind === "tab" ? item.tab : item.dimensionId}
             style={[styles.tile, { borderLeftColor: item.color }]}
-            onPress={() => navigation.navigate(item.tab)}
+            onPress={() => {
+              if (item.kind === "tab") {
+                navigation.navigate(item.tab);
+              } else {
+                navigation.navigate("DimensionDetail", { dimensionId: item.dimensionId });
+              }
+            }}
           >
             <Text style={styles.tileEmoji}>{item.emoji}</Text>
             <Text style={[styles.tileLabel, { color: item.color }]}>{item.titulo}</Text>
@@ -136,16 +151,16 @@ export function HomeScreen() {
         </SectionCard>
       ) : null}
 
-      <SectionCard badge="ESTADO DEL SUELO" title="Humedad óptima para siembra">
+      <SectionCard badge="ESTADO DEL SUELO" title="Medición con sensores IoT">
         <Text style={styles.soilBody}>
-          Condiciones favorables según tu ubicación GPS y el mes actual. Consulta Cultivo para
-          recomendaciones detalladas.
+          Registra humedad, pH, temperatura y conductividad del suelo con sensores en la parcela.
+          Los datos se guardan en Supabase para seguimiento técnico.
         </Text>
         <Pressable
           style={styles.soilBtn}
-          onPress={() => navigation.navigate("Cultivo")}
+          onPress={() => navigation.navigate("ModuloSensores")}
         >
-          <Text style={styles.soilBtnText}>Ver recomendación de cultivo</Text>
+          <Text style={styles.soilBtnText}>Ir a sensores de suelo →</Text>
         </Pressable>
       </SectionCard>
     </ScrollView>

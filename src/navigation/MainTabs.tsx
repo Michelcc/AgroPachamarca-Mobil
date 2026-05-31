@@ -1,13 +1,10 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StyleSheet, Text, View } from "react-native";
 import { OfflineBanner } from "../components/OfflineBanner";
-import { ClimaScreen } from "../screens/ClimaScreen";
 import { DatosScreen } from "../screens/DatosScreen";
+import { DimensionHubScreen } from "../screens/DimensionHubScreen";
 import { HomeScreen } from "../screens/HomeScreen";
-import { ProductosScreen } from "../screens/ProductosScreen";
-import { PlantaDiagnosticoScreen } from "../screens/PlantaDiagnosticoScreen";
 import { PerfilScreen } from "../screens/PerfilScreen";
-import { RecomendacionScreen } from "../screens/RecomendacionScreen";
 import { agro } from "../theme/agroTheme";
 import { MainTabParamList } from "./types";
 
@@ -16,10 +13,7 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 const tabEmoji: Record<keyof MainTabParamList, string> = {
   Inicio: "🏠",
   Datos: "📋",
-  Clima: "☁️",
-  Cultivo: "🌾",
-  Planta: "🔬",
-  Productos: "📦",
+  Dimensiones: "📊",
   Perfil: "👤"
 };
 
@@ -50,14 +44,11 @@ export function MainTabs() {
           component={DatosScreen}
           options={{ title: "Datos de campo", tabBarLabel: "Datos" }}
         />
-        <Tab.Screen name="Clima" component={ClimaScreen} options={{ title: "Clima y alertas" }} />
-        <Tab.Screen name="Cultivo" component={RecomendacionScreen} options={{ title: "Cultivo" }} />
         <Tab.Screen
-          name="Planta"
-          component={PlantaDiagnosticoScreen}
-          options={{ title: "Mi planta — IA", tabBarLabel: "Planta" }}
+          name="Dimensiones"
+          component={DimensionHubScreen}
+          options={{ title: "Dimensiones", tabBarLabel: "Dimensiones" }}
         />
-        <Tab.Screen name="Productos" component={ProductosScreen} />
         <Tab.Screen name="Perfil" component={PerfilScreen} options={{ headerShown: false }} />
       </Tab.Navigator>
     </View>
