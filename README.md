@@ -44,6 +44,22 @@ El sistema sigue un patrón **cliente → Supabase** con dos tipos de cliente y 
                     └─────────────────────────────────────────┘
 ```
 
+### ¿Qué significa esta arquitectura?
+
+Agro Pachamarca está pensado como un **sistema distribuido ligero**: dos aplicaciones (móvil y web) comparten **una sola base de datos** en la nube, sin montar ni mantener un servidor propio con Node, Java o PHP conectado a PostgreSQL. Ese enfoque se llama **BaaS** (Backend as a Service): Supabase nos da Auth, base de datos, almacenamiento de archivos y API REST automática sobre PostgreSQL.
+
+**La app móvil** es la herramienta del productor en el campo. Corre en Android (Expo/React Native), se instala como APK y funciona con la clave **anónima** de Supabase embebida en el build. Cuando el usuario inicia sesión, Supabase devuelve un **JWT** (token) que identifica quién es. A partir de ahí, cada consulta o inserción pasa por **Row Level Security (RLS)**: reglas SQL que impiden ver o modificar filas de otros usuarios. El productor solo accede a *sus* registros de campo, *sus* lecturas de sensores y *sus* indicadores de tesis, más el catálogo global de productos marcados como disponibles.
+
+**El panel web** es la herramienta del administrador o investigador. Está hecho con Next.js y se despliega en Vercel. No comparte la misma sesión que la app: tiene su propio login de panel (cookie JWT firmada con `SESSION_SECRET`). Para leer y escribir en Supabase usa la clave **service_role**, que **omite RLS** a propósito, porque el admin debe ver todos los productores, todas las alertas y todos los indicadores para supervisar el sistema y la investigación.
+
+**Entre ambos clientes no hay sincronización manual.** No existe un “servidor intermedio” que copie datos de un lado a otro. Si el productor guarda una lectura de humedad del suelo en la app, esa fila queda en `lecturas_sensor_suelo` y el panel la muestra al instante en `/admin/tablas/sensores`, porque ambos leen la misma tabla. Lo mismo ocurre con productos, alertas climáticas, recomendaciones ML e indicadores de operacionalización.
+
+**Vercel no almacena datos de negocio.** Solo ejecuta el panel Next.js y unas pocas rutas API (`/api/recomendaciones/predict`, `/api/alertas/predict`, login móvil, etc.) para lógica que conviene tener en el servidor: predicciones ML, cron de setup, o endpoints que la app consumía antes de conectar directo a Supabase. La **fuente de verdad** siempre es PostgreSQL en Supabase.
+
+**Servicios externos** (Open-Meteo, Google Gemini) se usan para enriquecer datos sin guardarlos en otro sitio: el clima se consulta en tiempo real, el diagnóstico de planta envía la foto a Gemini y el resultado se persiste en Supabase como cualquier otro registro. El modelo ML de cultivos vive como JSON/reglas en el código y corre en el dispositivo o en la API de Vercel, pero las recomendaciones generadas se guardan en `recomendaciones_cultivo`.
+
+En resumen: **móvil = captura en campo con RLS · web = supervisión global · Supabase = única base de datos · Vercel = hosting del panel y APIs auxiliares.** Esa separación reduce costos de infraestructura, acelera el desarrollo y mantiene coherencia entre lo que ve el productor y lo que analiza el investigador.
+
 ### Principios de diseño
 
 | Principio | Implementación |

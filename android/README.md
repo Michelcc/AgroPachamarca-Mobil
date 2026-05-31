@@ -28,6 +28,31 @@ Abre **`C:\m\android`** en Android Studio (ruta corta). No uses `subst P:`: romp
                   Supabase PostgreSQL + RLS
 ```
 
+### ¿Cómo funciona por dentro?
+
+La app no es solo una pantalla: está organizada en **capas** para separar la interfaz, la lógica de negocio y el acceso a datos.
+
+**Capa de navegación (`src/navigation/`)**  
+La barra inferior (*MainTabs*) tiene cuatro entradas: Inicio, Datos, Dimensiones y Perfil. Es la navegación que el productor usa todos los días. Encima corre un **Stack** (*RootNavigator*) para pantallas que se abren “encima”: el detalle de una dimensión, el módulo de productos, sensores, clima, cultivo o el registro GPS de una tabla de campo. Así evitamos saturar la barra con diez íconos y mantenemos la estructura de la tesis (dimensiones) como eje central.
+
+**Capa de pantallas (`src/screens/`)**  
+Cada pantalla muestra UI y reacciona a toques del usuario. Por ejemplo, `DimensionHubScreen` lista las cuatro dimensiones literales de la investigación; al elegir una, `DimensionDetailScreen` muestra los indicadores medibles y los accesos a módulos (productos, sensores, etc.). Las pantallas **no escriben SQL directo**: delegan en repositorios.
+
+**Capa de features (`src/features/`)**  
+Aquí vive la lógica reutilizable: `campo/` calcula progreso de registros GPS, `sensores/` inserta lecturas IoT e interpreta estado del suelo (seco, óptimo, saturado), `operacionalizacion/` guarda valores de indicadores de tesis. Cada feature usa el cliente Supabase configurado con la sesión del usuario logueado.
+
+**Capa de servicios (`src/services/`)**  
+Funciones puras o integraciones externas: captura GPS, interpretación de sensores, llamadas a APIs de clima. No conocen React; pueden testearse y reutilizarse desde varias pantallas.
+
+**Conexión con Supabase**  
+Al abrir la app, `AuthContext` restaura la sesión (email/contraseña vía Supabase Auth). El archivo `android/.env` aporta `EXPO_PUBLIC_SUPABASE_URL` y la **anon key** (formato `eyJ…`). Esa clave es pública en el APK, pero **no da acceso libre a los datos**: RLS en PostgreSQL exige que `user_id` coincida con `auth.uid()` en casi todas las tablas sensibles. El catálogo de productos usa políticas especiales (`patch-productos-catalog-rls.sql`) para que todos vean ítems marcados `disponible = true`.
+
+**Build Android**  
+El JavaScript de `../src/` se empaqueta dentro del APK con `instalar-app.ps1`. Por eso el productor **no necesita Metro ni PC encendido** en el campo: la app lleva el bundle JS y habla con Supabase por internet. Si cambias pantallas o lógica, hay que **volver a generar el APK** e instalarlo.
+
+**Relación con el panel web**  
+Todo lo que guarda la app (sensores, indicadores, alertas, etc.) aparece en el panel admin porque ambos escriben en las mismas tablas. La app es el **instrumento de captura**; el panel es la **vista agregada** para investigación y gestión.
+
 ### Navegación por dimensiones
 
 La pestaña **Dimensiones** muestra las 4 dimensiones de la tesis (*Cultivos agrícolas*):
