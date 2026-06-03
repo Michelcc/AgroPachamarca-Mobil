@@ -23,6 +23,7 @@ export function MainTabs() {
       <OfflineBanner />
       <Tab.Navigator
         screenOptions={({ route }) => ({
+          lazy: true,
           tabBarShowLabel: true,
           tabBarActiveTintColor: agro.green700,
           tabBarInactiveTintColor: agro.gray500,

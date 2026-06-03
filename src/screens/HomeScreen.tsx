@@ -9,7 +9,7 @@ import { ProgressBar } from "../components/ProgressBar";
 import { SectionCard } from "../components/SectionCard";
 import { calcularProgreso } from "../features/campo/campoRepository";
 import type { ProgresoCampo } from "../features/campo/campoRepository";
-import type { MainTabParamList, RootStackParamList } from "../navigation/types";
+import type { AppStackParamList, MainTabParamList } from "../navigation/types";
 import { DIMENSIONES_OPERACIONALIZACION } from "../schema/operacionalizacion";
 import { useAuth } from "../auth/AuthContext";
 import { captureGpsSnapshot } from "../utils/gpsService";
@@ -17,7 +17,7 @@ import { agro } from "../theme/agroTheme";
 
 type HomeNav = CompositeNavigationProp<
   BottomTabNavigationProp<MainTabParamList>,
-  NativeStackNavigationProp<RootStackParamList>
+  NativeStackNavigationProp<AppStackParamList>
 >;
 
 type AccesoRapido =

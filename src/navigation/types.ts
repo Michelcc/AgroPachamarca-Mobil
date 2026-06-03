@@ -3,16 +3,21 @@ export type AuthStackParamList = {
   Register: undefined;
 };
 
-export type RootStackParamList = {
-  Auth: undefined;
-  Main: undefined;
-  RegistroTabla: { tabla: string };
+/** Stack autenticado: tabs + pantallas modulares */
+export type AppStackParamList = {
+  MainTabs: undefined;
   DimensionDetail: { dimensionId: string };
   ModuloProductos: undefined;
   ModuloSensores: undefined;
   ModuloClima: undefined;
   ModuloCultivo: undefined;
   ModuloPlanta: undefined;
+  RegistroTabla: { tabla: string };
+};
+
+export type RootStackParamList = {
+  Auth: undefined;
+  App: undefined;
 };
 
 export type MainTabParamList = {
@@ -21,3 +26,6 @@ export type MainTabParamList = {
   Dimensiones: undefined;
   Perfil: undefined;
 };
+
+/** Compatibilidad con imports antiguos */
+export type { AppStackParamList as RootModalsParamList };

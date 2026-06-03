@@ -17,12 +17,13 @@ import { useAuth } from "../auth/AuthContext";
 import { SectionCard } from "../components/SectionCard";
 import { StatGrid } from "../components/StatGrid";
 import { loadUserProfile, type UserProfile } from "../features/perfil/profileRepository";
-import type { MainTabParamList, RootStackParamList } from "../navigation/types";
+import type { AppStackParamList, MainTabParamList } from "../navigation/types";
+import { useAppNavigation } from "../navigation/useAppNavigation";
 import { agro, APP_BRAND, APP_VERSION } from "../theme/agroTheme";
 
 type PerfilNav = CompositeNavigationProp<
   BottomTabNavigationProp<MainTabParamList>,
-  NativeStackNavigationProp<RootStackParamList>
+  NativeStackNavigationProp<AppStackParamList>
 >;
 
 function formatFecha(iso: string | null): string {

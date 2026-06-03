@@ -14,7 +14,6 @@ import { AgroInput } from "../components/AgroInput";
 import { ProgressBar } from "../components/ProgressBar";
 import { SectionCard } from "../components/SectionCard";
 import {
-  calcularCoberturaOperacional,
   insertIndicadorOperacional,
   ultimosPorIndicador,
   type RegistroOperacional
@@ -22,10 +21,10 @@ import {
 import { captureGpsSnapshot } from "../utils/gpsService";
 import { getDimensionById, MODULOS_POR_DIMENSION } from "../schema/dimensionModulos";
 import type { IndicadorOperacional } from "../schema/operacionalizacion";
-import type { RootStackParamList } from "../navigation/types";
+import type { AppStackParamList } from "../navigation/types";
 import { agro } from "../theme/agroTheme";
 
-type Props = NativeStackScreenProps<RootStackParamList, "DimensionDetail">;
+type Props = NativeStackScreenProps<AppStackParamList, "DimensionDetail">;
 
 function formatValor(r: RegistroOperacional | undefined): string {
   if (!r) return "Sin registro";

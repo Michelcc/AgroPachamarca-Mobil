@@ -5,10 +5,10 @@ import { GpsStatusBar } from "../components/GpsStatusBar";
 import { insertRegistroCampo, listRegistrosPorTabla } from "../features/campo/campoRepository";
 import type { RegistroCampo } from "../features/campo/campoRepository";
 import { useGpsAutoFill } from "../hooks/useGpsAutoFill";
-import { RootStackParamList } from "../navigation/types";
+import { AppStackParamList } from "../navigation/types";
 import { tableCategory, tableLabel } from "../schema/agroPostgresTables";
 
-type Props = NativeStackScreenProps<RootStackParamList, "RegistroTabla">;
+type Props = NativeStackScreenProps<AppStackParamList, "RegistroTabla">;
 
 function tituloAutomatico(tabla: string, lat: string, lng: string): string {
   const fecha = new Date().toLocaleString("es-PE", {

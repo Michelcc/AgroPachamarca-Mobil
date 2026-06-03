@@ -1,13 +1,11 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { SectionCard } from "../components/SectionCard";
 import { DIMENSIONES_OPERACIONALIZACION, VARIABLE_DEPENDIENTE } from "../schema/operacionalizacion";
-import type { RootStackParamList } from "../navigation/types";
+import { useAppNavigation } from "../navigation/useAppNavigation";
 import { agro } from "../theme/agroTheme";
 
 export function DimensionHubScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation = useAppNavigation();
 
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>

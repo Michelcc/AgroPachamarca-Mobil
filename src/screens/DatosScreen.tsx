@@ -13,7 +13,7 @@ import { ProgressBar } from "../components/ProgressBar";
 import { SectionCard } from "../components/SectionCard";
 import { calcularProgreso, tablasConRegistro } from "../features/campo/campoRepository";
 import type { ProgresoCampo } from "../features/campo/campoRepository";
-import type { RootStackParamList } from "../navigation/types";
+import type { AppStackParamList } from "../navigation/types";
 import {
   AGRO_POSTGRES_TABLES,
   TABLE_COUNT,
@@ -32,16 +32,24 @@ const CATEGORIAS_FILTRO: Array<TableCategory | "Todas"> = [
 ];
 
 export function DatosScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   const [busqueda, setBusqueda] = useState("");
   const [categoria, setCategoria] = useState<TableCategory | "Todas">("Todas");
   const [progreso, setProgreso] = useState<ProgresoCampo | null>(null);
   const [conRegistro, setConRegistro] = useState<Set<string>>(new Set());
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const recargar = useCallback(async () => {
-    const [p, t] = await Promise.all([calcularProgreso(), tablasConRegistro()]);
-    setProgreso(p);
-    setConRegistro(t);
+    try {
+      setLoadError(null);
+      const [p, t] = await Promise.all([calcularProgreso(), tablasConRegistro()]);
+      setProgreso(p);
+      setConRegistro(t);
+    } catch (e) {
+      setProgreso(null);
+      setConRegistro(new Set());
+      setLoadError(e instanceof Error ? e.message : "No se pudieron cargar los datos");
+    }
   }, []);
 
   useFocusEffect(
@@ -88,6 +96,8 @@ export function DatosScreen() {
             detail={`${progreso.tablasConRegistro} de ${progreso.totalTablas} tablas · ${progreso.totalRegistros} registros`}
             color={agro.purple600}
           />
+        ) : loadError ? (
+          <Text style={styles.loadError}>{loadError}</Text>
         ) : null}
 
         <TextInput
@@ -149,6 +159,7 @@ const styles = StyleSheet.create({
   header: { padding: 16, gap: 10, backgroundColor: agro.white, borderBottomWidth: 1, borderColor: agro.gray200 },
   title: { fontSize: 22, fontWeight: "800", color: agro.green900 },
   sub: { color: agro.gray500, fontSize: 13 },
+  loadError: { color: "#b91c1c", fontSize: 13, lineHeight: 18 },
   mapPlaceholder: {
     height: 80,
     backgroundColor: agro.green50,
