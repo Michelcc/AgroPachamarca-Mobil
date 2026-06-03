@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
       return;
     }
-    const sb = getSupabase();
+
     let cancelled = false;
     let finished = false;
 
@@ -48,29 +48,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     };
 
-    const timeout = setTimeout(finish, 4000);
+    const timeout = setTimeout(finish, 3000);
 
-    void sb.auth
-      .getSession()
-      .then(({ data }) => {
-        if (!cancelled) setSession(data.session);
-      })
-      .catch(() => {
-        /* clave inválida o sin red — mostrar login */
-      })
-      .finally(() => {
-        clearTimeout(timeout);
-        finish();
+    try {
+      const sb = getSupabase();
+      void sb.auth
+        .getSession()
+        .then(({ data }) => {
+          if (!cancelled) setSession(data.session);
+        })
+        .catch(() => {
+          /* clave inválida o sin red — mostrar login */
+        })
+        .finally(() => {
+          clearTimeout(timeout);
+          finish();
+        });
+
+      const { data: sub } = sb.auth.onAuthStateChange((_event, s) => {
+        setSession(s);
       });
 
-    const { data: sub } = sb.auth.onAuthStateChange((_event, s) => {
-      setSession(s);
-    });
-    return () => {
-      cancelled = true;
+      return () => {
+        cancelled = true;
+        clearTimeout(timeout);
+        sub.subscription.unsubscribe();
+      };
+    } catch {
       clearTimeout(timeout);
-      sub.subscription.unsubscribe();
-    };
+      finish();
+      return undefined;
+    }
   }, [supabaseReady]);
 
   useEffect(() => {
@@ -91,11 +99,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isAdmin: currentUser === "admin",
       supabaseReady,
       signIn: async (email: string, password: string) => {
-        const { error } = await getSupabase().auth.signInWithPassword({
+        const { data, error } = await getSupabase().auth.signInWithPassword({
           email: email.trim().toLowerCase(),
           password
         });
         if (error) throw error;
+        if (data.session) setSession(data.session);
       },
       signUp: async (email: string, password: string, nombre: string) => {
         const mail = email.trim().toLowerCase();

@@ -3,13 +3,10 @@ import { StatusBar } from "expo-status-bar";
 import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { enableScreens } from "react-native-screens";
 import { AppErrorBoundary } from "./src/components/AppErrorBoundary";
 import { AuthProvider } from "./src/auth/AuthContext";
 import { RootNavigator } from "./src/navigation/RootNavigator";
 import { agro } from "./src/theme/agroTheme";
-
-enableScreens(true);
 
 const navTheme = {
   ...DefaultTheme,
@@ -31,8 +28,10 @@ export default function App() {
         <AppErrorBoundary>
           <AuthProvider>
             <NavigationContainer theme={navTheme}>
-              <RootNavigator />
-              <StatusBar style="dark" backgroundColor={agro.gray50} />
+              <View style={styles.navShell}>
+                <RootNavigator />
+                <StatusBar style="dark" backgroundColor={agro.gray50} />
+              </View>
             </NavigationContainer>
           </AuthProvider>
         </AppErrorBoundary>
@@ -42,5 +41,6 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: agro.gray50 }
+  root: { flex: 1, backgroundColor: agro.gray50 },
+  navShell: { flex: 1, backgroundColor: agro.gray50 }
 });

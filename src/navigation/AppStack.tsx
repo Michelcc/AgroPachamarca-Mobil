@@ -22,7 +22,11 @@ const stackScreenOptions = {
 export function AppStack() {
   return (
     <Stack.Navigator screenOptions={stackScreenOptions}>
-      <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
+      <Stack.Screen
+        name="MainTabs"
+        component={MainTabs}
+        options={{ headerShown: false, animation: "none" }}
+      />
       <Stack.Screen
         name="DimensionDetail"
         component={DimensionDetailScreen}

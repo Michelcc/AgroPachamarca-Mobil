@@ -1,4 +1,4 @@
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createBottomTabNavigator, BottomTabBar, type BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { StyleSheet, Text, View } from "react-native";
 import { OfflineBanner } from "../components/OfflineBanner";
 import { DatosScreen } from "../screens/DatosScreen";
@@ -17,52 +17,57 @@ const tabEmoji: Record<keyof MainTabParamList, string> = {
   Perfil: "👤"
 };
 
-export function MainTabs() {
+function TabBarWithBanner(props: BottomTabBarProps) {
   return (
-    <View style={styles.shell}>
+    <View style={styles.tabBarShell}>
       <OfflineBanner />
-      <View style={styles.tabsWrap}>
-        <Tab.Navigator
-          initialRouteName="Inicio"
-          screenOptions={({ route }) => ({
-            lazy: true,
-            tabBarShowLabel: true,
-            tabBarActiveTintColor: agro.green700,
-            tabBarInactiveTintColor: agro.gray500,
-            tabBarStyle: styles.tabBar,
-            tabBarIcon: ({ focused }) => (
-              <Text style={[styles.tabIcon, focused && styles.tabIconActive]}>
-                {tabEmoji[route.name as keyof MainTabParamList]}
-              </Text>
-            ),
-            tabBarLabelStyle: styles.tabLabel,
-            headerStyle: { backgroundColor: agro.white },
-            headerTitleStyle: { fontWeight: "800", color: agro.green900, fontSize: 17 },
-            headerShadowVisible: false,
-            sceneContainerStyle: { backgroundColor: agro.gray50 }
-          })}
-        >
-          <Tab.Screen name="Inicio" component={HomeScreen} options={{ headerShown: false }} />
-          <Tab.Screen
-            name="Datos"
-            component={DatosScreen}
-            options={{ title: "Datos de campo", tabBarLabel: "Datos" }}
-          />
-          <Tab.Screen
-            name="Dimensiones"
-            component={DimensionHubScreen}
-            options={{ title: "Dimensiones", tabBarLabel: "Dimensiones" }}
-          />
-          <Tab.Screen name="Perfil" component={PerfilScreen} options={{ headerShown: false }} />
-        </Tab.Navigator>
-      </View>
+      <BottomTabBar {...props} />
     </View>
   );
 }
 
+export function MainTabs() {
+  return (
+    <Tab.Navigator
+      initialRouteName="Inicio"
+      tabBar={(props) => <TabBarWithBanner {...props} />}
+      screenOptions={({ route }) => ({
+        lazy: false,
+        tabBarShowLabel: true,
+        tabBarActiveTintColor: agro.green700,
+        tabBarInactiveTintColor: agro.gray500,
+        tabBarStyle: styles.tabBar,
+        tabBarIcon: ({ focused }) => (
+          <Text style={[styles.tabIcon, focused && styles.tabIconActive]}>
+            {tabEmoji[route.name as keyof MainTabParamList]}
+          </Text>
+        ),
+        tabBarLabelStyle: styles.tabLabel,
+        headerStyle: { backgroundColor: agro.white },
+        headerTitleStyle: { fontWeight: "800", color: agro.green900, fontSize: 17 },
+        headerShadowVisible: false,
+        sceneContainerStyle: styles.scene
+      })}
+    >
+      <Tab.Screen name="Inicio" component={HomeScreen} options={{ headerShown: false }} />
+      <Tab.Screen
+        name="Datos"
+        component={DatosScreen}
+        options={{ title: "Datos de campo", tabBarLabel: "Datos" }}
+      />
+      <Tab.Screen
+        name="Dimensiones"
+        component={DimensionHubScreen}
+        options={{ title: "Dimensiones", tabBarLabel: "Dimensiones" }}
+      />
+      <Tab.Screen name="Perfil" component={PerfilScreen} options={{ headerShown: false }} />
+    </Tab.Navigator>
+  );
+}
+
 const styles = StyleSheet.create({
-  shell: { flex: 1, backgroundColor: agro.gray50 },
-  tabsWrap: { flex: 1 },
+  tabBarShell: { backgroundColor: agro.white },
+  scene: { flex: 1, backgroundColor: agro.gray50 },
   tabBar: {
     backgroundColor: agro.white,
     borderTopColor: agro.gray200,

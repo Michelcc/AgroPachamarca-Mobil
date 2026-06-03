@@ -9,6 +9,7 @@ import {
   Text,
   View
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useAuth } from "../auth/AuthContext";
 import { getSupabaseConfigWarning } from "../supabase/client";
@@ -36,6 +37,7 @@ function authErrorMessage(error: unknown): string {
 
 export function LoginScreen({ navigation }: Props) {
   const { signIn, supabaseReady } = useAuth();
+  const insets = useSafeAreaInsets();
   const configWarning = getSupabaseConfigWarning();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -82,7 +84,10 @@ export function LoginScreen({ navigation }: Props) {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[
+          styles.container,
+          { paddingTop: Math.max(insets.top, 24) + 24, paddingBottom: insets.bottom + 24 }
+        ]}
         keyboardShouldPersistTaps="handled"
       >
         <BrandLogo />
