@@ -21,43 +21,48 @@ export function MainTabs() {
   return (
     <View style={styles.shell}>
       <OfflineBanner />
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          lazy: true,
-          tabBarShowLabel: true,
-          tabBarActiveTintColor: agro.green700,
-          tabBarInactiveTintColor: agro.gray500,
-          tabBarStyle: styles.tabBar,
-          tabBarIcon: ({ focused }) => (
-            <Text style={[styles.tabIcon, focused && styles.tabIconActive]}>
-              {tabEmoji[route.name as keyof MainTabParamList]}
-            </Text>
-          ),
-          tabBarLabelStyle: styles.tabLabel,
-          headerStyle: { backgroundColor: agro.white },
-          headerTitleStyle: { fontWeight: "800", color: agro.green900, fontSize: 17 },
-          headerShadowVisible: false
-        })}
-      >
-        <Tab.Screen name="Inicio" component={HomeScreen} options={{ headerShown: false }} />
-        <Tab.Screen
-          name="Datos"
-          component={DatosScreen}
-          options={{ title: "Datos de campo", tabBarLabel: "Datos" }}
-        />
-        <Tab.Screen
-          name="Dimensiones"
-          component={DimensionHubScreen}
-          options={{ title: "Dimensiones", tabBarLabel: "Dimensiones" }}
-        />
-        <Tab.Screen name="Perfil" component={PerfilScreen} options={{ headerShown: false }} />
-      </Tab.Navigator>
+      <View style={styles.tabsWrap}>
+        <Tab.Navigator
+          initialRouteName="Inicio"
+          screenOptions={({ route }) => ({
+            lazy: true,
+            tabBarShowLabel: true,
+            tabBarActiveTintColor: agro.green700,
+            tabBarInactiveTintColor: agro.gray500,
+            tabBarStyle: styles.tabBar,
+            tabBarIcon: ({ focused }) => (
+              <Text style={[styles.tabIcon, focused && styles.tabIconActive]}>
+                {tabEmoji[route.name as keyof MainTabParamList]}
+              </Text>
+            ),
+            tabBarLabelStyle: styles.tabLabel,
+            headerStyle: { backgroundColor: agro.white },
+            headerTitleStyle: { fontWeight: "800", color: agro.green900, fontSize: 17 },
+            headerShadowVisible: false,
+            sceneContainerStyle: { backgroundColor: agro.gray50 }
+          })}
+        >
+          <Tab.Screen name="Inicio" component={HomeScreen} options={{ headerShown: false }} />
+          <Tab.Screen
+            name="Datos"
+            component={DatosScreen}
+            options={{ title: "Datos de campo", tabBarLabel: "Datos" }}
+          />
+          <Tab.Screen
+            name="Dimensiones"
+            component={DimensionHubScreen}
+            options={{ title: "Dimensiones", tabBarLabel: "Dimensiones" }}
+          />
+          <Tab.Screen name="Perfil" component={PerfilScreen} options={{ headerShown: false }} />
+        </Tab.Navigator>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   shell: { flex: 1, backgroundColor: agro.gray50 },
+  tabsWrap: { flex: 1 },
   tabBar: {
     backgroundColor: agro.white,
     borderTopColor: agro.gray200,

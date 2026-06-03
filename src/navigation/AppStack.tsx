@@ -6,21 +6,22 @@ import { ProductosScreen } from "../screens/ProductosScreen";
 import { RegistroTablaScreen } from "../screens/RegistroTablaScreen";
 import { RecomendacionScreen } from "../screens/RecomendacionScreen";
 import { SensoresSueloScreen } from "../screens/SensoresSueloScreen";
+import { agro } from "../theme/agroTheme";
 import { MainTabs } from "./MainTabs";
 import type { AppStackParamList } from "./types";
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
+const stackScreenOptions = {
+  headerStyle: { backgroundColor: agro.white },
+  headerTitleStyle: { fontWeight: "800" as const, color: agro.green900, fontSize: 17 },
+  headerShadowVisible: false,
+  contentStyle: { flex: 1, backgroundColor: agro.gray50 }
+};
+
 export function AppStack() {
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: { backgroundColor: "#ffffff" },
-        headerTitleStyle: { fontWeight: "800", color: "#14532d", fontSize: 17 },
-        headerShadowVisible: false,
-        contentStyle: { backgroundColor: "#f9fafb" }
-      }}
-    >
+    <Stack.Navigator screenOptions={stackScreenOptions}>
       <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
       <Stack.Screen
         name="DimensionDetail"

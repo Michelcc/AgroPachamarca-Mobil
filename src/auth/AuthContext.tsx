@@ -40,9 +40,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     const sb = getSupabase();
     let cancelled = false;
-    const timeout = setTimeout(() => {
-      if (!cancelled) setLoading(false);
-    }, 8000);
+    let finished = false;
+
+    const finish = () => {
+      if (cancelled || finished) return;
+      finished = true;
+      setLoading(false);
+    };
+
+    const timeout = setTimeout(finish, 4000);
 
     void sb.auth
       .getSession()
@@ -53,8 +59,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         /* clave inválida o sin red — mostrar login */
       })
       .finally(() => {
-        if (!cancelled) setLoading(false);
         clearTimeout(timeout);
+        finish();
       });
 
     const { data: sub } = sb.auth.onAuthStateChange((_event, s) => {

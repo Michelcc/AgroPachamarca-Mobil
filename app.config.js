@@ -27,7 +27,7 @@ module.exports = {
     version: "0.1.0",
     orientation: "portrait",
     scheme: "agro",
-    userInterfaceStyle: "automatic",
+    userInterfaceStyle: "light",
     newArchEnabled: false,
     splash: {
       resizeMode: "contain",
